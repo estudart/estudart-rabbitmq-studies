@@ -1,0 +1,1 @@
+# estudart-rabbitmq-studies
