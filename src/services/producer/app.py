@@ -1,9 +1,12 @@
-from src.utils.extensions import rabbit_instance
+from src.utils.extensions import create_rabbit_instance
 
-for i in range(10):
+rabbit_instance = create_rabbit_instance('producer')
+
+while True:
+    user_message = input(f"Type new message: ")
     rabbit_instance.publish(
         'letterbox',
         message=(
-            f"This is a new message: {i}"
+            f"This is a new message: {user_message}"
         )
     )
