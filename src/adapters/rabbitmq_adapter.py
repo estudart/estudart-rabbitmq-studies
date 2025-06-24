@@ -5,10 +5,13 @@ from threading import Thread
 import pika
 from dotenv import load_dotenv
 
+from src.adapters.logger_adapter import LoggerAdapter
+
 load_dotenv()
 
 class RabbitMQ:
     def __init__(self, connection_type):
+        self.logger = LoggerAdapter().get_logger()
         self.user = os.getenv('RABBITMQ_USER', 'user')
         self.password = os.getenv('RABBITMQ_PASSWORD', 'password')
         self.host = os.getenv('RABBITMQ_HOST', 'localhost')
@@ -22,7 +25,7 @@ class RabbitMQ:
         self._connect()
 
     def _start_keep_alive(self):
-        print("Started keep alive thread")
+        self.logger.info("Started keep alive thread")
         keep_alive_thread = Thread(target=self.keep_alive, daemon=True)
         keep_alive_thread.start()
 
@@ -57,7 +60,7 @@ class RabbitMQ:
             self.connection.close()
 
     def consume(self, queue_name, callback):
-        print("Starting consuming")
+        self.logger.info("Starting consuming")
         if not self.channel:
             raise Exception("Connection is not established.")
         self.channel.queue_declare(queue=queue_name)
@@ -74,4 +77,4 @@ class RabbitMQ:
                                    properties=pika.BasicProperties(
                                        delivery_mode=2,  # make message persistent
                                    ))
-        print(f"Sent message to queue {queue_name}: {message}")
+        self.logger.info(f"Sent message to queue {queue_name}: {message}")
